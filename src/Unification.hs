@@ -87,7 +87,7 @@ unifyS t1 t2 = do
   σ <- gets substitution
   let mσ' = unify (t1 <\> σ) (t2 <\> σ)
   σ' <- fromMaybe mzero (fmap return mσ')
-  let σ'' = σ' <.> σ
+  let σ'' = σ <.> σ'
   modify (\s -> s { substitution = σ'' })
   return σ''
 

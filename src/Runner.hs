@@ -38,12 +38,19 @@ mpIO f xs = mapM_ (putStrLn . f) xs
 testMatch rs q = mapM_ (putStrLn . ppMatch) (match rs q)
 
 testRS :: RuleSystem UnificationVar
+-- testRS = [
+--           parseRule "R1 @ kind(iain) <- ;",
+--           parseRule "R2 @ virgin(iain) <- ;",
+--           parseRule "R4 @ kind(kassia) <- ;",
+--           parseRule "R5 @ virgin(kassia) <- ;",
+--           parseRule "R8 @ good(?X) <- kind(?X), virgin(?X);"
+--     ]
 testRS = [
-          parseRule "R1 @ kind(iain) <- ;",
-          parseRule "R2 @ virgin(iain) <- ;",
-          parseRule "R4 @ kind(kassia) <- ;",
-          parseRule "R5 @ virgin(kassia) <- ;",
-          parseRule "R8 @ good(?X) <- kind(?X), virgin(?X);"
+          parseRule "R1 @ friends(iain,kassia) <- ;",
+          parseRule "R2 @ friends(kassia,kai) <- ;",
+          parseRule "R3 @ friends(kai,nick) <- ;",
+          parseRule "R4 @ friends(nick,alice) <- ;",
+          parseRule "R6 @ friends(?X,?Y) <- friends(?X,?Z), friends(?Z,?Y);"
     ]
 -- testRS = [
 --           parseRule "BobAlice @ knows(bob,alice) <- ;",
@@ -62,4 +69,5 @@ testQ = (parseQuery "good(iain)")
 
 
 -- testRun = runUnifyS (unifyS (parseQuery "good(iain)") (parseQuery "good(?X)")) testRS
-testRun = runUnifyS (verifyS (parseQuery "good(?X)")) testRS
+-- testRun = runUnifyS (verifyS (parseQuery "good(?X)")) testRS
+testRun = runUnifyS (verifyS (parseQuery "friends(?X,?Y)")) testRS
