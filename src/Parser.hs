@@ -10,7 +10,7 @@ import Text.Parsec.String (Parser)
 
 nameParser :: Parser Name
 nameParser = do
-  n <- many1 alphaNum
+  n <- many1 (alphaNum <|> char '_')
   spaces
   return n
 

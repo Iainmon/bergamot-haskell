@@ -5,9 +5,15 @@ import Parser
 import Unification
 
 import Data.List (intercalate)
-
+import Control.Monad
 import Data.Map (Map)
 import qualified Data.Map as Map
+
+import Unsafe.Coerce (unsafeCoerce)
+
+{-# INLINE coio #-}
+coio :: IO a -> a
+coio = unsafeCoerce
 
 -- Check if a valid unifier can be produced for a term and a given rule
 matchRule :: Ord k => Rule k -> Term k -> Maybe (Substitution k)
@@ -38,6 +44,16 @@ mpIO f xs = mapM_ (putStrLn . f) xs
 testMatch rs q = mapM_ (putStrLn . ppMatch) (match rs q)
 
 testRS :: RuleSystem UnificationVar
+
+
+-- testRS = [
+--           parseRule "R1 @ kind(iain) <- ;",
+--           parseRule "R2 @ virgin(iain) <- ;",
+--           parseRule "R4 @ kind(kassia) <- ;",
+--           parseRule "R8 @ good(?X) <- kind(?X), virgin(?X);"
+--     ]
+
+
 -- testRS = [
 --           parseRule "R1 @ kind(iain) <- ;",
 --           parseRule "R2 @ virgin(iain) <- ;",
@@ -45,11 +61,18 @@ testRS :: RuleSystem UnificationVar
 --           parseRule "R5 @ virgin(kassia) <- ;",
 --           parseRule "R8 @ good(?X) <- kind(?X), virgin(?X);"
 --     ]
+
+-- testRS = [
+--           parseRule "TNumber @ type(?Gamma, intlit(?n), number) <-;",
+--           parseRule "TString @ type(?Gamma, strlit(?s), string) <-;",
+--           parseRule "TVar @ type(?Gamma, var(?x), ?tau) <- inenv(?x, ?tau, ?Gamma);",
+--           parseRule "TPlusI @ type(?Gamma, plus(?e_1, ?e_2), number) <- type(?Gamma, ?e_1, number), type(?Gamma, ?e_2, number);",
+--           parseRule "TPlusS @ type(?Gamma, plus(?e_1, ?e_2), string) <- type(?Gamma, ?e_1, string), type(?Gamma, ?e_2, string);"
+--     ]
+
 testRS = [
           parseRule "R1 @ friends(iain,kassia) <- ;",
           parseRule "R2 @ friends(kassia,kai) <- ;",
-          parseRule "R3 @ friends(kai,nick) <- ;",
-          parseRule "R4 @ friends(nick,alice) <- ;",
           parseRule "R6 @ friends(?X,?Y) <- friends(?X,?Z), friends(?Z,?Y);"
     ]
 -- testRS = [
@@ -70,4 +93,19 @@ testQ = (parseQuery "good(iain)")
 
 -- testRun = runUnifyS (unifyS (parseQuery "good(iain)") (parseQuery "good(?X)")) testRS
 -- testRun = runUnifyS (verifyS (parseQuery "good(?X)")) testRS
-testRun = runUnifyS (verifyS (parseQuery "friends(?X,?Y)")) testRS
+-- testRun = runUnifyS (verifyS (parseQuery "friends(?X,?Y)")) testRS
+
+query = "friends(iain,?X)"
+testRun = runUnifyS (verifyS (parseQuery query)) testRS
+
+
+prog = do 
+  mapM_ print prog'
+  
+  where prog' = do
+          (_,s) <- testRun
+          let c = substitution s
+          let q = parseQuery query
+          let q' = q <\> c
+          return q'
+

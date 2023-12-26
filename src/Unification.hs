@@ -91,10 +91,10 @@ unifyS t1 t2 = do
   modify (\s -> s { substitution = σ'' })
   return σ''
 
-updateS :: Ord k => Substitution k -> UnifyS k ()
-updateS σ' = do
-  σ <- gets substitution
-  modify (\s -> s { substitution = σ' <.> σ })
+-- updateS :: Ord k => Substitution k -> UnifyS k ()
+-- updateS σ' = do
+--   σ <- gets substitution
+--   modify (\s -> s { substitution = σ' <.> σ })
 
 applyS :: Ord k => Term k -> UnifyS k (Rule k)
 applyS t = do
