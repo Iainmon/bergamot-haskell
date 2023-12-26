@@ -18,6 +18,7 @@ import Data.List (intercalate)
 import Syntax
 import Parser (parseRule, parseQuery)
 import Data.Maybe (fromMaybe)
+import qualified Debug.Trace as Trace
 
 type Substitution k = Map k (Term k)
 
@@ -78,7 +79,7 @@ data UnifyState k
 emptyUS :: UnifyState k
 emptyUS = MkUnifyState emptyS 0 []
 
-
+-- UnifyState k -> [(a, UnifyState k)]
 type UnifyS k a = StateT (UnifyState k) [] a
 
 
@@ -104,10 +105,18 @@ applyS t = do
   return r
 
 
+checkS :: Ord k => Term k -> Term k -> UnifyS k Bool
+checkS t1 t2 = do
+  σ <- gets substitution
+  return $ check t1 t2 σ
 
-verifyS :: Ord k => Term k -> UnifyS k ()
+
+verifyS :: (Show k,Ord k) => Term k -> UnifyS k ()
 verifyS t = do
   r <- applyS t
+  -- σ <- gets substitution
+  -- () <- return $ Trace.trace (show t ++ show σ) ()
+  -- guard $ and (map (\p -> not $ check t p σ) (premises r))
   sequence_ $ map verifyS (premises r)
 
   -- ps <- map (<\> σ) <$> mapM applyS (premises r)
@@ -118,7 +127,14 @@ verifyS t = do
 runUnifyS :: Ord k => UnifyS k a -> RuleSystem k -> [(a, UnifyState k)]
 runUnifyS m rs = runStateT m (MkUnifyState emptyS 0 rs)
 
+execUnifyS :: Ord k => UnifyS k a -> RuleSystem k -> [UnifyState k]
+execUnifyS m rs = execStateT m (MkUnifyState emptyS 0 rs)
 
+solutionSubs :: (Show k,Ord k) => Term k -> RuleSystem k -> [Substitution k]
+solutionSubs t rs = map substitution (execUnifyS (verifyS t) rs)
+
+solutions :: (Show k,Ord k) => Term k -> RuleSystem k -> [Term k]
+solutions t rs = map (t <\>) (solutionSubs t rs)
 
 
 
