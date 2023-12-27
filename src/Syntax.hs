@@ -20,6 +20,8 @@ newtype UnificationVar = MKUnificationVar Name
 instance Show UnificationVar where
   show (MKUnificationVar n) = n
 
+
+
 unMetaVar :: MetaVar -> Name
 unMetaVar (MKMetaVar n) = n
 

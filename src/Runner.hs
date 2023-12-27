@@ -16,25 +16,23 @@ coio :: IO a -> a
 coio = unsafeCoerce
 
 -- Check if a valid unifier can be produced for a term and a given rule
-matchRule :: Ord k => Rule k -> Term k -> Maybe (Substitution k)
+matchRule :: UVar k => Rule k -> Term k -> Maybe (Substitution k)
 matchRule (Rule _ c ps) t = if check c t σ then Just σ else Nothing
   where σ = c <~> t
 
 -- Just finds all of the rules that a valid unifier can be created. Doesn't modify anything
-match :: Ord k => RuleSystem k -> Term k -> [(Rule k, Substitution k)]
+match :: UVar k => RuleSystem k -> Term k -> [(Rule k, Substitution k)]
 match rs t = [ (r,σ) | r <- rs, Just σ <- [matchRule r t] ]
 
 -- Applies the substitution to the rule
-apply :: Ord k => Substitution k -> Rule k -> Rule k
+apply :: UVar k => Substitution k -> Rule k -> Rule k
 apply σ (Rule n c ps) = Rule n (c <\> σ) (map (<\> σ) ps)
 
 -- Applies the substitution to the rule and its premises
-applyMatches :: Ord k => [(Rule k, Substitution k)] -> [(Rule k, Substitution k)]
+applyMatches :: UVar k => [(Rule k, Substitution k)] -> [(Rule k, Substitution k)]
 applyMatches = map (\(r,σ) -> (apply σ r, σ))
 
 
-ppSubstitution :: Show k => Substitution k -> String
-ppSubstitution σ = "{" ++ (intercalate ", " (map (\(k,v) -> show k ++ " -> " ++ show v) (Map.toList σ))) ++ "}"
 
 ppMatch :: Show k => (Rule k, Substitution k) -> String
 ppMatch (r,σ) = show r ++ " ~ " ++ ppSubstitution σ
@@ -71,11 +69,13 @@ testRS :: RuleSystem UnificationVar
 --           parseRule "TPlusS @ type(?Gamma, plus(?e_1, ?e_2), string) <- type(?Gamma, ?e_1, string), type(?Gamma, ?e_2, string);"
 --     ]
 
-testRS = [
-          parseRule "R1 @ friends(iain,kassia) <- ;",
-          parseRule "R2 @ friends(kassia,kai) <- ;",
-          parseRule "R6 @ friends(?X,?Y) <- friends(?X,?Z), friends(?Z,?Y);"
-    ]
+-- testRS = [
+--           parseRule "R1 @ friends(iain,kassia) <- ;",
+--           parseRule "R2 @ friends(kassia,kai) <- ;",
+--           parseRule "R6 @ friends(?X,?Y) <- friends(?X,?Z), friends(?Z,?Y);"
+--     ]
+-- query = parseQuery "friends(iain,?Y)"
+
 -- testRS = [
 --           parseRule "BobAlice @ knows(bob,alice) <- ;",
 --           parseRule "AliceCarol @ knows(alice,carol) <- ;",
@@ -96,10 +96,18 @@ testQ = (parseQuery "good(iain)")
 -- testRun = runUnifyS (verifyS (parseQuery "good(?X)")) testRS
 -- testRun = runUnifyS (verifyS (parseQuery "friends(?X,?Y)")) testRS
 
-query = parseQuery "friends(iain,?Y)"
-testRun :: [((), UnifyState UnificationVar)]
+testRS = map parseRule $ ["Lit" ++ show n ++ " @ int(" ++ show n ++ ") <- ;" | n <- [0..2]] ++ rules
+ where rules = [
+                "TInt @ type(EInt(?N),Int) <- int(?N);",
+                "TPlus @ type(EPlus(?X,?Y),Int) <- type(?X,Int), type(?Y,Int);"
+         ]
+query = parseQuery "type(EPlus(EInt(1),EInt(1)),?T)"
 testRun = runUnifyS (verifyS query) testRS
 
+
+{--
+type(EPlus(EInt(1),EInt(1)),?T)
+--}
 
 prog = do 
   mapM_ print prog'
