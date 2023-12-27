@@ -99,7 +99,8 @@ testQ = (parseQuery "good(iain)")
 testRS = map parseRule $ ["Lit" ++ show n ++ " @ int(" ++ show n ++ ") <- ;" | n <- [0..2]] ++ rules
  where rules = [
                 "TInt @ type(EInt(?N),Int) <- int(?N);",
-                "TPlus @ type(EPlus(?X,?Y),Int) <- type(?X,Int), type(?Y,Int);"
+                "TPlus @ type(EPlus(?X,?Y),Int) <- type(?X,Int), type(?Y,Int);",
+                "TPair @ type(EPair(?X,?Y),TPair(?A,?B)) <- type(?X,?A), type(?Y,?B);"
          ]
 query = parseQuery "type(EPlus(EInt(1),EInt(1)),?T)"
 testRun = runUnifyS (verifyS query) testRS
