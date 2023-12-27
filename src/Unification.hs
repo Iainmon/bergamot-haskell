@@ -97,12 +97,28 @@ unifyS t1 t2 = do
 --   σ <- gets substitution
 --   modify (\s -> s { substitution = σ' <.> σ })
 
+unifyRuleS :: Ord k => Term k -> Rule k -> UnifyS k (Rule k)
+unifyRuleS t r = do
+  unifyS (conclusion r) t
+  return r
+
+-- not treating each rule check seperately
 applyS :: Ord k => Term k -> UnifyS k (Rule k)
 applyS t = do
   rs <- gets rules
-  r <- lift rs
-  unifyS (conclusion r) t
-  return r
+  σ <- gets substitution
+  let rss = map (unifyRuleS t) rs
+  x <- msum rss
+  return x
+  -- modify (\s -> s { substitution = σ })
+
+
+-- applyS t = do
+--   rs <- gets rules
+--   σ <- gets substitution
+--   r <- lift rs
+--   unifyS (conclusion r) t
+--   return r
 
 
 checkS :: Ord k => Term k -> Term k -> UnifyS k Bool
@@ -115,14 +131,8 @@ verifyS :: (Show k,Ord k) => Term k -> UnifyS k ()
 verifyS t = do
   r <- applyS t
   -- σ <- gets substitution
-  -- () <- return $ Trace.trace (show t ++ show σ) ()
-  -- guard $ and (map (\p -> not $ check t p σ) (premises r))
   sequence_ $ map verifyS (premises r)
-
-  -- ps <- map (<\> σ) <$> mapM applyS (premises r)
-  -- mapM_ verifyS ps
-  -- updateS (c <~> (conclusion r))
-
+  
 -- runUnifyS :: Ord k => UnifyS k a -> RuleSystem k -> [(a, Substitution k)]
 runUnifyS :: Ord k => UnifyS k a -> RuleSystem k -> [(a, UnifyState k)]
 runUnifyS m rs = runStateT m (MkUnifyState emptyS 0 rs)
@@ -226,3 +236,5 @@ applyRule _ _ _ = Nothing
 -- prove σ t (Rule _ c ps) = 
 --   where σ' = c <~> (t <\> σ)
 
+  -- () <- return $ Trace.trace (show t ++ show σ) ()
+  -- guard $ and (map (\p -> not $ check t p σ) (premises r))

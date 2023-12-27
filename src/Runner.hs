@@ -46,13 +46,13 @@ testMatch rs q = mapM_ (putStrLn . ppMatch) (match rs q)
 testRS :: RuleSystem UnificationVar
 
 
-testRS = [
-          parseRule "R1 @ kind(iain) <- ;",
-          parseRule "R2 @ virgin(iain) <- ;",
-          parseRule "R4 @ kind(kassia) <- ;",
-          parseRule "R5 @ virgin(kassia) <- ;",
-          parseRule "R8 @ good(?X) <- kind(?X), virgin(?X);"
-    ]
+-- testRS = [
+--           parseRule "R1 @ kind(iain) <- ;",
+--           parseRule "R2 @ virgin(iain) <- ;",
+--           parseRule "R4 @ kind(kassia) <- ;",
+--           parseRule "R5 @ virgin(kassia) <- ;",
+--           parseRule "R8 @ good(?X) <- kind(?X), virgin(?X);"
+--     ]
 
 
 -- testRS = [
@@ -71,11 +71,11 @@ testRS = [
 --           parseRule "TPlusS @ type(?Gamma, plus(?e_1, ?e_2), string) <- type(?Gamma, ?e_1, string), type(?Gamma, ?e_2, string);"
 --     ]
 
--- testRS = [
---           parseRule "R1 @ friends(iain,kassia) <- ;",
---           parseRule "R2 @ friends(kassia,kai) <- ;",
---           parseRule "R6 @ friends(?X,?Y) <- friends(?X,?Z), friends(?Z,?Y);"
---     ]
+testRS = [
+          parseRule "R1 @ friends(iain,kassia) <- ;",
+          parseRule "R2 @ friends(kassia,kai) <- ;",
+          parseRule "R6 @ friends(?X,?Y) <- friends(?X,?Z), friends(?Z,?Y);"
+    ]
 -- testRS = [
 --           parseRule "BobAlice @ knows(bob,alice) <- ;",
 --           parseRule "AliceCarol @ knows(alice,carol) <- ;",
@@ -96,7 +96,7 @@ testQ = (parseQuery "good(iain)")
 -- testRun = runUnifyS (verifyS (parseQuery "good(?X)")) testRS
 -- testRun = runUnifyS (verifyS (parseQuery "friends(?X,?Y)")) testRS
 
-query = parseQuery "good(?X)"
+query = parseQuery "friends(iain,?Y)"
 testRun :: [((), UnifyState UnificationVar)]
 testRun = runUnifyS (verifyS query) testRS
 
