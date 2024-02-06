@@ -1,4 +1,4 @@
-module Unification where
+module Bergamot.Unification where
 
 import Control.Applicative
 import Control.Monad
@@ -15,8 +15,8 @@ import qualified Data.Set as Set
 
 import Data.List (intercalate)
 
-import Syntax
-import Parser (parseRule, parseQuery)
+import Bergamot.Syntax
+import Bergamot.Parser (parseRule, parseQuery)
 import Data.Maybe (fromMaybe)
 import qualified Debug.Trace as Trace
 import Data.Char (digitToInt,ord,chr)

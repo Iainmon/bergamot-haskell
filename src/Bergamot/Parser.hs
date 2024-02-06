@@ -1,7 +1,7 @@
-module Parser where
+module Bergamot.Parser where
 
 
-import Syntax
+import Bergamot.Syntax
 
 
 import Text.Parsec hiding (runP)

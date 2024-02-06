@@ -1,4 +1,4 @@
-module MyLib  where
+module Bergamot.MyLib  where
 import Control.Monad
 
 someFunc :: IO ()

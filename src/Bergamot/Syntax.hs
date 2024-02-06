@@ -1,4 +1,4 @@
-module Syntax where
+module Bergamot.Syntax where
 import Control.Applicative
 import Control.Monad
 import Data.List (intercalate)

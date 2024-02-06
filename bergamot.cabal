@@ -23,11 +23,11 @@ extra-source-files: CHANGELOG.md
 
 library
     exposed-modules:
-        MyLib,
-        Syntax,
-        Unification,
-        Parser,
-        Runner,
+        Bergamot.MyLib,
+        Bergamot.Syntax,
+        Bergamot.Unification,
+        Bergamot.Parser,
+        Bergamot.Runner,
         Control.Monad.Unify.Class,
         Control.Monad.Unify.Trans,
         Control.Monad.State.LGBT,
@@ -52,6 +52,7 @@ library
 
     hs-source-dirs:
         src,
+        src/Bergamot,
         src/Control/Monad/Unify,
         src/Control/Monad,
         src/Control/Monad/State,

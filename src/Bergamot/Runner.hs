@@ -1,8 +1,8 @@
-module Runner where
+module Bergamot.Runner where
 
-import Syntax
-import Parser
-import Unification
+import Bergamot.Syntax
+import Bergamot.Parser
+import Bergamot.Unification
 
 import Data.List (intercalate)
 import Control.Monad
